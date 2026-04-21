@@ -1,1 +1,5 @@
-
+Q1: FDB separates the TMS and SS where the TMS is stateless and handles all the database operations such as reads and writes, and makes sure everything is ACID. the SS just holds all the data that is read and written. These two parts are decoupled for efficiency reasons. If there are failures, instead of having to look at big write ahead logs and rebuilding everything, it can just restart a new TMS machine if one fails since its stateless. keeping them separated 
+Q2: In the TMS part, its the resolver that detects read write conflicts. the checking happens after the client does the operations but before the commit.
+Q3: the read version marks the start of the client's interaction, so the client has a single unchanging point of view for their changes. This allows for the system to gaurantee serializability and causality. 
+Q4: in standard reads the FDB will add the read keys to the read-set for the resolver to look at and check for conflicts. Snapshot read doesn't add to the read-set so there is no checking for conflict so it means snapshot is faster but there is a risk of losing data or making mistakes.
+Q5: recovery is cheap because the logservers just start anew from where the old logservers left off. And the SS will pull the old stuff and the new stuff and it will all work without having to replay huge logfiles
